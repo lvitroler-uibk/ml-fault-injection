@@ -34,4 +34,5 @@ class Injector:
             source = workerTensorflow.inject(fault_type)
 
         if source:
+            print('File has been changed')
             write_new_source_code(self.fileName, source)
