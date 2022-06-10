@@ -1,4 +1,5 @@
 from shared.ast_parser import Visitor
+from shared.utils import change_line_source
 
 class WorkerPyTorch:
     
@@ -26,10 +27,12 @@ class WorkerPyTorch:
 
         varValue = batchSizeParam.name
         if varValue.isdigit():
-            newValue = int(varValue) * int(varValue)
-            lineno = batchSizeParam.start_lineno - 1
-            newSource = self.source
-            newSource[lineno] = self.source[lineno].replace(batchSizeName + '=' + varValue, batchSizeName + '=' + str(newValue))
+            newSource = change_line_source(
+                self.source,
+                batchSizeParam.start_lineno - 1,
+                batchSizeName + '=' + varValue,
+                batchSizeName + '=' + str(int(varValue) * int(varValue))
+            )
         else:
             varLines = [idx for idx, s in enumerate(self.source) if varValue in s]
             varLines.reverse()
@@ -38,14 +41,18 @@ class WorkerPyTorch:
                 var = self.visitor.lineno_varname[line + 1][0]
                 if var == varValue:
                     varvalue = self.visitor.lineno_varvalue[line + 1][0]
-                    newValue = int(varvalue.value) * int(varvalue.value)
-                    newSource = self.source
-                    newSource[line] = self.source[line].replace(str(varvalue.value), str(newValue))
+                    newSource = change_line_source(
+                        self.source,
+                        line,
+                        str(varvalue.value),
+                        str(int(varvalue.value) * int(varvalue.value))
+                    )
                     break
+
         return newSource
 
     def inject(self, faultType):
         if faultType == 'memory':
             return self.causeOutOfMemoryException()
-
-        print(faultType)
+        else:
+            print('Fault Type is not supported.')

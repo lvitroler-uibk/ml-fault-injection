@@ -131,3 +131,9 @@ def write_new_source_code(filePath, source_code):
 
     with open(newFilePath, 'w', encoding='utf-8') as f:
         f.write(new_raw_source)
+
+def change_line_source(source, lineNo, oldText, newText):
+    newSource = source
+    newSource[lineNo] = source[lineNo].replace(oldText, newText)
+    
+    return newSource
