@@ -1,6 +1,7 @@
 import ast
 # import astunparse
 from collections import defaultdict, namedtuple, deque, OrderedDict
+
 from shared.utils import find_parameter_end
 
 class Visitor(ast.NodeVisitor):
@@ -9,11 +10,13 @@ class Visitor(ast.NodeVisitor):
 
         self.lineno_varname = OrderedDict()
         self.lineno_function_call = OrderedDict()
+        self.lineno_varvalue = OrderedDict()
 
         self.var = namedtuple('variable', ['name', 'lineno', 'start_index'])
         # include start_index but not include end_index
         self.raw_param = namedtuple('raw_param', ['name', 'start_lineno', 'start_index', 'end_lineno', 'end_index'])
         self.func_key = namedtuple('func_key', ['name', 'lineno', 'start_index'])
+        self.varvalue = namedtuple('varvalue', ['name', 'value'])
 
         self.func_key_var_params = defaultdict(list) # func_key:[var or func_key]
         self.func_key_raw_params = defaultdict(list) # func_key:[(None or key, raw_param)]
@@ -103,6 +106,12 @@ class Visitor(ast.NodeVisitor):
         for t in node.targets:
             if isinstance(t, ast.Name):
                 targets.append(self.var(t.id, t.lineno, t.col_offset))
+
+                if isinstance(node.value, ast.Constant):
+                    varvalue = self.varvalue(t.id, node.value.value)
+                    if node.lineno not in self.lineno_varvalue:
+                        self.lineno_varvalue[node.lineno] = []
+                    self.lineno_varvalue[node.lineno].append(varvalue)
             elif isinstance(t, ast.Tuple):
                 for tt in t.elts:
                     if isinstance(tt, ast.Name):
