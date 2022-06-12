@@ -24,8 +24,8 @@ def causeOutOfMemoryException(source, searchString, visitor: Visitor):
         newSource = change_line_source(
             source,
             batchSizeParam.start_lineno - 1,
-            batchSizeName + '=' + varValue,
-            batchSizeName + '=' + str(int(varValue) * int(varValue))
+            varValue,
+            str(int(varValue) * int(varValue))
         )
     else:
         varLines = [idx for idx, s in enumerate(source) if varValue in s]
