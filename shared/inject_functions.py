@@ -105,3 +105,49 @@ def injectFiiModelInputShape(source, searchString, visitor: Visitor):
             break
 
     return newSource
+
+def causeAdjacentLayerIncompatible(source, searchString, visitor: Visitor):
+    funcs = getFuncs(visitor, searchString)
+    if len(funcs) == 0:
+        return None
+    
+    newSource = source
+    for func in funcs:
+        newSource = change_line_source(
+            newSource,
+            func.lineno - 1,
+            newSource[func.lineno - 1],
+            ''
+        )
+
+    return newSource
+
+def causeLoiModelOutputShape(source, searchString, visitor: Visitor):
+    funcs = getFuncs(visitor, searchString)
+    if len(funcs) == 0:
+        return None
+    
+    newSource = source
+    for func in funcs:
+        funParams = visitor.func_key_raw_params[func]
+        _, rawParam = funParams[0]
+
+        funcStartPos = rawParam.start_index
+        oldString = newSource[func.lineno - 1][funcStartPos:]
+
+        commaPos = oldString.find(',')
+        elipsisPos = oldString.find(')')
+        denseEndPos = commaPos
+        if commaPos < 0 or commaPos > elipsisPos:
+            denseEndPos = elipsisPos
+        oldString = oldString[:denseEndPos + 1]
+
+        newSource = change_line_source(
+            newSource,
+            func.lineno - 1,
+            oldString,
+            oldString.replace(str(rawParam.name), str(int(rawParam.name) + int(rawParam.name)))
+        )
+
+    return newSource
+
