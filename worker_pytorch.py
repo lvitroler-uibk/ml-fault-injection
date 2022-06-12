@@ -9,7 +9,7 @@ class WorkerPyTorch:
         self.visitor = visitor
 
     def causeOutOfMemoryException(self):
-        return injections.causeOutOfMemoryException(self.source, 'DataLoader(', self.visitor)
+        return injections.causeOutOfMemoryException(self.source, 'DataLoader', self.visitor)
 
     def inject(self, faultType):
         if faultType == 'memory':

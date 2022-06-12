@@ -1,18 +1,24 @@
 from shared.utils import change_line_source
 from shared.ast_parser import Visitor
 
-def getFuncLines(source, searchString):
-    return [idx for idx, s in enumerate(source) if searchString in s]
+def getFuncs(visitor: Visitor, searchString):
+    foundFuncs = []
+
+    for _, funcs in visitor.lineno_function_call.items():
+        for func in funcs:
+            if searchString in func.name:
+                foundFuncs.append(func)
+
+    return foundFuncs
 
 def causeOutOfMemoryException(source, searchString, visitor: Visitor):
-    funcLines = getFuncLines(source, searchString)
-    if len(funcLines) == 0:
+    funcs = getFuncs(visitor, searchString)
+    if len(funcs) == 0:
         return None
     
     newSource = None
     batchSizeName = 'batch_size'
-    index = funcLines[0]
-    func = visitor.lineno_function_call[index + 1][0]
+    func = funcs[0]
 
     fun_params = visitor.func_key_raw_params[func]
     
@@ -48,31 +54,54 @@ def causeOutOfMemoryException(source, searchString, visitor: Visitor):
 
     return newSource
 
-def injectFoiExpandDims(source, searchString, visitor: Visitor):
-    funcLines = getFuncLines(source, searchString)
-    if len(funcLines) == 0:
+def injectFiiExpandDims(source, searchString, visitor: Visitor):
+    funcs = getFuncs(visitor, searchString)
+    if len(funcs) == 0:
         return None
     
     newSource = source
-    for funcLine in funcLines:
-        functions = visitor.lineno_function_call[funcLine + 1]
-        functions.reverse()
-        for func in functions:
-            if searchString not in func.name:
+    funcs.reverse()
+    for func in funcs:
+        if searchString not in func.name:
+            continue
+
+        funParams = visitor.func_key_raw_params[func]
+
+        funcStartPos = func.start_index
+        funcEndPos = newSource[func.lineno - 1].find(')', funcStartPos) + 1
+        _, rawParam = funParams[0]
+        funcFirstVar = rawParam.name
+
+        newSource = change_line_source(
+        newSource,
+        func.lineno - 1,
+        newSource[func.lineno - 1][funcStartPos:funcEndPos],
+        funcFirstVar
+)
+
+    return newSource
+
+def injectFiiModelInputShape(source, searchString, visitor: Visitor):
+    funcs = getFuncs(visitor, searchString)
+    if len(funcs) == 0:
+        return None
+    
+    newSource = None
+    for func in funcs:
+        funParams = visitor.func_key_raw_params[func]
+        for name, rawParam in funParams:
+            if name is None or 'input_dim' not in name:
                 continue
 
-            funParams = visitor.func_key_raw_params[func]
-
-            funcStartPos = func.start_index
-            funcEndPos = newSource[funcLine].find(')', funcStartPos) + 1
-            _, rawParam = funParams[0]
-            funcFirstVar = rawParam.name
+            funcStartPos = rawParam.start_index
+            oldString = source[func.lineno - 1][funcStartPos:]
 
             newSource = change_line_source(
-            newSource,
-            funcLine,
-            newSource[funcLine][funcStartPos:funcEndPos],
-            funcFirstVar
-    )
+                source,
+                func.lineno - 1,
+                oldString,
+                oldString.replace(str(rawParam.name), str(int(rawParam.name) + int(rawParam.name)))
+            )
+            break
 
     return newSource

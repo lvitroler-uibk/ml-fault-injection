@@ -11,29 +11,26 @@ class WorkerKeras:
     def causeFeatureInputIncompatible(self):
         possibleFaults = [
             'expandDims',
-            'input'
+            'modelInputShape'
         ]
         random.shuffle(possibleFaults)
         newSource = None
 
         for fault in possibleFaults:
-            if fault == 'input':
-                newSource = self.injectFoiInput()
+            if fault == 'modelInputShape':
+                newSource = injections.injectFiiModelInputShape(self.source, 'Dense', self.visitor)
             elif fault == 'expandDims':
-                newSource = injections.injectFoiExpandDims(self.source, 'expand_dims', self.visitor)
+                newSource = injections.injectFiiExpandDims(self.source, 'expand_dims', self.visitor)
 
             if newSource is not None:
                 break
 
         return newSource
 
-    def injectFoiInput(self):
-        return None
-
     def inject(self, faultType):
         if faultType == 'memory':
-            return injections.causeOutOfMemoryException(self.source, '.fit(', self.visitor)
-        elif faultType == 'FOI':
+            return injections.causeOutOfMemoryException(self.source, 'fit', self.visitor)
+        elif faultType == 'FII':
             return self.causeFeatureInputIncompatible()
         else:
             print('Fault Type is not supported.')
