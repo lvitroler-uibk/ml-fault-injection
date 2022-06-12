@@ -1,8 +1,11 @@
 from shared.utils import change_line_source
 from shared.ast_parser import Visitor
 
+def getFuncLines(source, searchString):
+    return [idx for idx, s in enumerate(source) if searchString in s]
+
 def causeOutOfMemoryException(source, searchString, visitor: Visitor):
-    funcLines = [idx for idx, s in enumerate(source) if searchString in s]
+    funcLines = getFuncLines(source, searchString)
     if len(funcLines) == 0:
         return None
     
@@ -42,5 +45,34 @@ def causeOutOfMemoryException(source, searchString, visitor: Visitor):
                     str(int(varvalue.value) * int(varvalue.value))
                 )
                 break
+
+    return newSource
+
+def injectFoiExpandDims(source, searchString, visitor: Visitor):
+    funcLines = getFuncLines(source, searchString)
+    if len(funcLines) == 0:
+        return None
+    
+    newSource = source
+    for funcLine in funcLines:
+        functions = visitor.lineno_function_call[funcLine + 1]
+        functions.reverse()
+        for func in functions:
+            if searchString not in func.name:
+                continue
+
+            funParams = visitor.func_key_raw_params[func]
+
+            funcStartPos = func.start_index
+            funcEndPos = newSource[funcLine].find(')', funcStartPos) + 1
+            _, rawParam = funParams[0]
+            funcFirstVar = rawParam.name
+
+            newSource = change_line_source(
+            newSource,
+            funcLine,
+            newSource[funcLine][funcStartPos:funcEndPos],
+            funcFirstVar
+    )
 
     return newSource

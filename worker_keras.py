@@ -1,16 +1,12 @@
 import random
-from shared.ast_parser import Visitor
+import shared.inject_functions as injections
 from shared.utils import change_line_source
-from shared.inject_functions import causeOutOfMemoryException
 
 class WorkerKeras:
     
-    def __init__(self, source, visitor: Visitor):
+    def __init__(self, source, visitor):
         self.source = source
         self.visitor = visitor
-
-    def causeOutOfMemoryException(self):
-        return causeOutOfMemoryException(self.source, '.fit(', self.visitor)
 
     def causeFeatureInputIncompatible(self):
         possibleFaults = [
@@ -24,22 +20,19 @@ class WorkerKeras:
             if fault == 'input':
                 newSource = self.injectFoiInput()
             elif fault == 'expandDims':
-                newSource = self.injectFoiExpandDims()
+                newSource = injections.injectFoiExpandDims(self.source, 'expand_dims', self.visitor)
 
             if newSource is not None:
                 break
 
         return newSource
-    
-    def injectFoiExpandDims(self):
-        return None
 
     def injectFoiInput(self):
         return None
 
     def inject(self, faultType):
         if faultType == 'memory':
-            return self.causeOutOfMemoryException()
+            return injections.causeOutOfMemoryException(self.source, '.fit(', self.visitor)
         elif faultType == 'FOI':
             return self.causeFeatureInputIncompatible()
         else:

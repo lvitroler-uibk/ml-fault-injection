@@ -1,6 +1,6 @@
+import shared.inject_functions as injections
 from shared.ast_parser import Visitor
 from shared.utils import change_line_source
-from shared.inject_functions import causeOutOfMemoryException
 
 class WorkerPyTorch:
     
@@ -9,7 +9,7 @@ class WorkerPyTorch:
         self.visitor = visitor
 
     def causeOutOfMemoryException(self):
-        return causeOutOfMemoryException(self.source, 'DataLoader(', self.visitor)
+        return injections.causeOutOfMemoryException(self.source, 'DataLoader(', self.visitor)
 
     def inject(self, faultType):
         if faultType == 'memory':
