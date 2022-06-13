@@ -49,8 +49,7 @@ def causeOutOfMemoryException(source, searchString, visitor: Visitor):
     else:
         varLines = getVars(visitor, varValue)
         varLines.reverse()
-        print(varValue)
-        
+
         for line in varLines:
             var = visitor.lineno_varname[line][0]
             if var == varValue:

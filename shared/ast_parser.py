@@ -1,5 +1,5 @@
 import ast
-# import astunparse
+import sys
 from collections import defaultdict, namedtuple, deque, OrderedDict
 
 from shared.utils import find_parameter_end
@@ -107,8 +107,11 @@ class Visitor(ast.NodeVisitor):
             if isinstance(t, ast.Name):
                 targets.append(self.var(t.id, t.lineno, t.col_offset))
 
-                if isinstance(node.value, ast.Constant):
-                    varvalue = self.varvalue(t.id, node.value.value)
+                if isinstance(node.value, ast.Constant) or isinstance(node.value, ast.Num) or isinstance(node.value, ast.Str):
+                    if sys.version_info < (3, 8):
+                        varvalue = self.varvalue(t.id, node.value.n)
+                    else:
+                        varvalue = self.varvalue(t.id, node.value.value)
                     if node.lineno not in self.lineno_varvalue:
                         self.lineno_varvalue[node.lineno] = []
                     self.lineno_varvalue[node.lineno].append(varvalue)
