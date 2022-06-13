@@ -36,7 +36,8 @@ def find_parameter_end(line_sources, start_lineno, start_index):
                 if c in ['(', '[', '{']:
                     stack.append(c)
                 elif c in [']', '}']:
-                    stack.pop()
+                    if len(stack) != 0:
+                        stack.pop()
                 elif c == ')':
                     if len(stack) == 0:
                         return i+1, j
