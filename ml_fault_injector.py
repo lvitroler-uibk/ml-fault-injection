@@ -12,3 +12,4 @@ if __name__ == '__main__':
             injector.inject(fault_type)
     except Exception as e:
         print('ERROR: ' + str(e))
+        raise e

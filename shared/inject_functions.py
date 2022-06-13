@@ -11,6 +11,16 @@ def getFuncs(visitor: Visitor, searchString):
 
     return foundFuncs
 
+def getVars(visitor: Visitor, searchString):
+    foundVars = []
+
+    for lineno, vars in visitor.lineno_varname.items():
+        for var in vars:
+            if searchString in var:
+                foundVars.append(lineno)
+
+    return foundVars
+
 def causeOutOfMemoryException(source, searchString, visitor: Visitor):
     funcs = getFuncs(visitor, searchString)
     if len(funcs) == 0:
@@ -37,16 +47,17 @@ def causeOutOfMemoryException(source, searchString, visitor: Visitor):
             str(int(varValue) * int(varValue))
         )
     else:
-        varLines = [idx for idx, s in enumerate(source) if varValue in s]
+        varLines = getVars(visitor, varValue)
         varLines.reverse()
+        print(varValue)
         
         for line in varLines:
-            var = visitor.lineno_varname[line + 1][0]
+            var = visitor.lineno_varname[line][0]
             if var == varValue:
-                varvalue = visitor.lineno_varvalue[line + 1][0]
+                varvalue = visitor.lineno_varvalue[line][0]
                 newSource = change_line_source(
                     source,
-                    line,
+                    line - 1,
                     str(varvalue.value),
                     str(int(varvalue.value) * int(varvalue.value))
                 )
