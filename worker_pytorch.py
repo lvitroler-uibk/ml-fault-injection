@@ -14,5 +14,7 @@ class WorkerPyTorch:
     def inject(self, faultType):
         if faultType == 'memory':
             return self.causeOutOfMemoryException()
+        elif faultType == 'ALI':
+            return injections.causeAdjacentLayerIncompatible(self.source, 'flatten', self.visitor)
         else:
             print('Fault Type is not supported.')
