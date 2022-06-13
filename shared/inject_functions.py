@@ -29,6 +29,7 @@ def causeOutOfMemoryException(source, searchString, visitor: Visitor):
     newSource = None
     batchSizeName = 'batch_size'
     func = funcs[0]
+    RIDICULOUS_BATCH_SIZE = 100000
 
     fun_params = visitor.func_key_raw_params[func]
     
@@ -44,7 +45,7 @@ def causeOutOfMemoryException(source, searchString, visitor: Visitor):
             source,
             batchSizeParam.start_lineno - 1,
             varValue,
-            str(int(varValue) * int(varValue))
+            str(int(varValue) * RIDICULOUS_BATCH_SIZE)
         )
     else:
         varLines = getVars(visitor, varValue)
@@ -58,7 +59,7 @@ def causeOutOfMemoryException(source, searchString, visitor: Visitor):
                     source,
                     line - 1,
                     str(varvalue.value),
-                    str(int(varvalue.value) * int(varvalue.value))
+                    str(int(varvalue.value) * RIDICULOUS_BATCH_SIZE)
                 )
                 break
 
