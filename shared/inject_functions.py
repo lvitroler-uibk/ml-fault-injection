@@ -92,7 +92,7 @@ def injectFiiExpandDims(source, searchString, visitor: Visitor):
 
     return newSource
 
-def injectFiiModelInputShape(source, searchString, visitor: Visitor):
+def injectFiiModelInputShape(source, searchString, visitor: Visitor, checkForInputDim = True):
     funcs = getFuncs(visitor, searchString)
     if len(funcs) == 0:
         return None
@@ -101,19 +101,22 @@ def injectFiiModelInputShape(source, searchString, visitor: Visitor):
     for func in funcs:
         funParams = visitor.func_key_raw_params[func]
         for name, rawParam in funParams:
-            if name is None or 'input_dim' not in name:
+            if checkForInputDim and (name is None or 'input_dim' not in name):
                 continue
 
             funcStartPos = rawParam.start_index
             oldString = source[func.lineno - 1][funcStartPos:]
+            oldValue = rawParam.name
+            if not checkForInputDim:
+                commaPos = oldString.find(',')
+                oldString = oldString[commaPos + 1:]
 
             newSource = change_line_source(
                 source,
                 func.lineno - 1,
                 oldString,
-                oldString.replace(str(rawParam.name), str(int(rawParam.name) + int(rawParam.name)))
+                oldString.replace(str(oldValue), str(int(oldValue) + int(oldValue)))
             )
-            break
 
     return newSource
 
