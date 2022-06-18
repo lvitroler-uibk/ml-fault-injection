@@ -1,5 +1,11 @@
 from pathlib import Path 
 
+def getIndexOfStringInList(list, search_term):
+    for index, value in enumerate(list):
+        if search_term in value:
+            return index
+    return -1
+
 def resolve_shape(v):
     if hasattr(v, 'shape'):
         s = v.shape
@@ -125,10 +131,10 @@ def split_tuple_or_list_string(s):
         list_tuple.append(value)
     return list_tuple
 
-def write_new_source_code(filePath, source_code):
+def write_new_source_code(filePath, source_code, injectSuffix = '_injected'):
     new_raw_source = ''.join(source_code)
     suffix = Path(filePath).suffix
-    newFilePath = filePath.replace(suffix, '_injected' + suffix) 
+    newFilePath = filePath.replace(suffix, injectSuffix + suffix) 
 
     with open(newFilePath, 'w', encoding='utf-8') as f:
         f.write(new_raw_source)

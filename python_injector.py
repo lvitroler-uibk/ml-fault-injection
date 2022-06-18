@@ -5,7 +5,7 @@ from worker_keras import WorkerKeras
 from worker_pytorch import WorkerPyTorch
 from worker_tensorflow import WorkerTensorflow
 
-class Injector:
+class PythonInjector:
     def __init__(self, fileName):
         self.fileName = fileName
         self.source = open(fileName, 'r').readlines()
