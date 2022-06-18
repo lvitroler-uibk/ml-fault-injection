@@ -23,9 +23,10 @@ class DockerfileInjector:
             self.libraries['torchvision'] = '0.5.0'
             self.libraries['torchaudio'] = '0.4.0'
         elif 'keras' in raw_source:
-            self.libraries = []
+            self.libraries['tensorflow'] = '1.15.2'
+            self.libraries['keras'] = '2.3.1'
         elif 'tensorflow' in raw_source:
-            self.libraries = []
+            self.libraries['tensorflow'] = '1.15.2'
     
     def deleteLibraries(self):
         newSource = None
