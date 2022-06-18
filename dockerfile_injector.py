@@ -2,6 +2,7 @@ import os
 
 from shared.utils import write_new_source_code
 from shared.utils import getIndexOfStringInList
+from shared.utils import change_line_source
 
 class DockerfileInjector:
     def __init__(self, fileName):
@@ -42,7 +43,22 @@ class DockerfileInjector:
         return newSource
 
     def changeLibraries(self):
-        return None
+        newSource = None
+
+        for library in self.libraries:
+            if newSource is None:
+                newSource = self.source
+
+            index = getIndexOfStringInList(newSource, library)
+            if index >= 0:
+                newSource = change_line_source(
+                    newSource,
+                    index,
+                    newSource[index][newSource[index].rfind('=') + 1:newSource[index].rfind('\n')],
+                    self.libraries[library]
+                )
+
+        return newSource
         
     def inject(self, fault_type):
         source = None
