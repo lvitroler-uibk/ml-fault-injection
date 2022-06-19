@@ -51,11 +51,12 @@ class DockerfileInjector:
 
             index = getIndexOfStringInList(newSource, library)
             if index >= 0:
+                versionNumber = newSource[index][newSource[index].rfind('=') + 1:newSource[index].rfind('\n')]
                 newSource = change_line_source(
                     newSource,
                     index,
-                    newSource[index][newSource[index].rfind('=') + 1:newSource[index].rfind('\n')],
-                    self.libraries[library]
+                    newSource[index][newSource[index].rfind('=') + 1:],
+                    newSource[index][newSource[index].rfind('=') + 1:].replace(versionNumber, self.libraries[library])
                 )
 
         return newSource
