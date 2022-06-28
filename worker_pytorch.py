@@ -1,3 +1,4 @@
+from shared.utils import change_line_source
 import random
 import shared.inject_functions as injections
 
@@ -39,6 +40,37 @@ class WorkerPyTorch:
 
         return newSource
     
+    # https://pytorch.org/blog/pytorch-0_4_0-migration-guide/
+    def causeApiMismatch(self):
+        funcs = injections.getFuncs(self.visitor, '.to')
+        if len(funcs) == 0:
+            return None
+
+        newSource = self.source
+        previousFuncLineNo = 0
+        offset = 0
+
+        for func in funcs:
+            lineNo = func.lineno - 1
+            startIndex = func.start_index
+            if previousFuncLineNo == lineNo:
+                startIndex += offset
+            
+            lineString = newSource[lineNo][startIndex:]
+            oldString = lineString[:lineString.find(')') + 1]
+            newString = 'Variable(' + lineString[:lineString.find('.')] + ')'
+            offset = len(newString) - len(oldString)
+
+            newSource = change_line_source(
+                newSource,
+                lineNo,
+                oldString,
+                newString
+            )
+            previousFuncLineNo = lineNo
+
+        return newSource
+
     def inject(self, faultType):
         if faultType == 'memory':
             return injections.causeOutOfMemoryException(self.source, 'DataLoader', self.visitor)
@@ -48,5 +80,7 @@ class WorkerPyTorch:
             return injections.causeAdjacentLayerIncompatible(self.source, 'flatten', self.visitor)
         elif faultType == 'LOI':
             return self.causeLabelOutputIncompatible()
+        elif faultType == 'API':
+            return self.causeApiMismatch()
         else:
             print('Fault Type is not supported.')
