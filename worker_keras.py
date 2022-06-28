@@ -42,6 +42,14 @@ class WorkerKeras:
 
         return newSource
     
+    def causeApiMismatch(self):
+        exchanges = {
+            'epochs': 'nb_epoch',
+            'nb_epoch': 'epochs'
+        }
+
+        return injections.exchangeParameterNames(self.source, 'fit', exchanges, self.visitor)
+    
     def inject(self, faultType):
         if faultType == 'memory':
             return injections.causeOutOfMemoryException(self.source, 'fit', self.visitor)
@@ -51,5 +59,7 @@ class WorkerKeras:
             return injections.causeAdjacentLayerIncompatible(self.source, 'Flatten', self.visitor)
         elif faultType == 'LOI':
             return self.causeLabelOutputIncompatible()
+        elif faultType == 'API':
+            return self.causeApiMismatch()
         else:
             print('Fault Type is not supported.')

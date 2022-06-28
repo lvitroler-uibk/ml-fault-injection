@@ -141,6 +141,6 @@ def write_new_source_code(filePath, source_code, injectSuffix = '_injected'):
 
 def change_line_source(source, lineNo, oldText, newText):
     newSource = source
-    newSource[lineNo] = source[lineNo].replace(oldText, newText)
+    newSource[lineNo] = source[lineNo].replace(oldText, newText, 1)
     
     return newSource

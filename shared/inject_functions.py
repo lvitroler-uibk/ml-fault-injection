@@ -165,3 +165,27 @@ def causeLoiModelOutputShape(source, searchString, visitor: Visitor):
 
     return newSource
 
+def exchangeParameterNames(source, methodName, exchanges, visitor: Visitor):
+    funcs = getFuncs(visitor, methodName)
+    if len(funcs) == 0:
+        return None
+    
+    newSource = None
+    func = funcs[len(funcs) - 1]
+
+    fun_params = visitor.func_key_raw_params[func]
+    
+    for funParamName, exchange in exchanges.items():
+        for name, param in fun_params:
+            if name is None or funParamName not in name:
+                continue
+
+            newSource = change_line_source(
+                source,
+                param.start_lineno - 1,
+                name,
+                exchange
+            )
+            break
+
+    return newSource

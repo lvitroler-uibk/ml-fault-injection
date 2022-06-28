@@ -51,5 +51,7 @@ class WorkerTensorflow:
             return injections.causeAdjacentLayerIncompatible(self.source, 'Flatten', self.visitor)
         elif faultType == 'LOI':
             return self.causeLabelOutputIncompatible()
+        elif faultType == 'API':
+            return self.causeApiMismatch()
         else:
             print('Fault Type is not supported.')
