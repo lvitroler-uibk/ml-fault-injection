@@ -47,7 +47,7 @@ class WorkerPyTorch:
             return None
 
         newSource = self.source
-        previousFuncLineNo = 0
+        previousFuncLineNo = -1
         offset = 0
 
         for func in funcs:
@@ -71,6 +71,33 @@ class WorkerPyTorch:
 
         return newSource
 
+    def causeGpuUsageMismatch(self):
+        funcTo = '.to'
+        funcs = injections.getFuncs(self.visitor, funcTo)
+        if len(funcs) == 0:
+            return None
+
+        newSource = self.source
+        previousFuncLineNo = -1
+
+        for func in funcs:
+            lineNo = func.lineno - 1
+            startIndex = func.start_index
+            if previousFuncLineNo == lineNo:
+                lineString = newSource[lineNo][startIndex:]
+
+                newSource = change_line_source(
+                    newSource,
+                    lineNo,
+                    lineString[:lineString.find(')') + 1],
+                    lineString[:lineString.find(funcTo)]
+                )
+                break
+
+            previousFuncLineNo = lineNo
+
+        return newSource
+
     def inject(self, faultType):
         if faultType == 'memory':
             return injections.causeOutOfMemoryException(self.source, 'DataLoader', self.visitor)
@@ -82,5 +109,7 @@ class WorkerPyTorch:
             return self.causeLabelOutputIncompatible()
         elif faultType == 'API':
             return self.causeApiMismatch()
+        elif faultType == 'GPU':
+            return self.causeGpuUsageMismatch()
         else:
             print('Fault Type is not supported.')
