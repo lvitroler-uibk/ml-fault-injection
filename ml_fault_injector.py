@@ -10,12 +10,14 @@ if __name__ == '__main__':
     fileName = sys.argv[3]
 
     try:
-        if break_repair == 'break-python':
+        if break_repair == 'python':
             injector = PythonInjector(fileName)
             injector.inject(fault_type)
-        if break_repair == 'break-dockerfile':
+        elif break_repair == 'dockerfile':
             injector = DockerfileInjector(fileName)
             injector.inject(fault_type)
+        else:
+            print('Wrong parameter')
     except Exception as e:
         print('ERROR: ' + str(e))
         raise e

@@ -61,5 +61,7 @@ class WorkerKeras:
             return self.causeLabelOutputIncompatible()
         elif faultType == 'API':
             return self.causeApiMismatch()
+        elif faultType == 'optim':
+            return injections.changeOptimiser(self.source, 'compile', self.visitor)
         else:
             print('Fault Type is not supported.')

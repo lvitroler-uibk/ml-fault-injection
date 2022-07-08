@@ -1,3 +1,5 @@
+import random
+
 from shared.utils import change_line_source
 from shared.ast_parser import Visitor
 
@@ -187,5 +189,42 @@ def exchangeParameterNames(source, methodName, exchanges, visitor: Visitor):
                 exchange
             )
             break
+
+    return newSource
+
+def changeOptimiser(source, methodName, visitor: Visitor):
+    funcs = getFuncs(visitor, methodName)
+    if len(funcs) == 0:
+        return None
+    
+    optimisers = [
+        'Adadelta',
+        'Adagrad',
+        "Adam",
+        'Adamax',
+        'NAdam',
+        'RMSprop',
+        'SGD',
+        ]
+    newSource = None
+    func = funcs[len(funcs) - 1]
+    fun_params = visitor.func_key_raw_params[func]
+
+    for name, param in fun_params:
+        if name is None or 'optimizer' not in name:
+            continue
+
+        paramName = param.name.replace('"', '')
+        loweredOptimisers = list(name.lower() for name in optimisers)
+        
+        optimisers.pop(loweredOptimisers.index(paramName.lower()))
+        random.shuffle(optimisers)
+        newSource = change_line_source(
+                source,
+                param.start_lineno - 1,
+                paramName,
+                optimisers[0]
+            )
+        break;
 
     return newSource
