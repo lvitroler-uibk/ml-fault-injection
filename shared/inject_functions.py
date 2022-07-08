@@ -192,12 +192,8 @@ def exchangeParameterNames(source, methodName, exchanges, visitor: Visitor):
 
     return newSource
 
-def changeOptimiser(source, methodName, visitor: Visitor):
-    funcs = getFuncs(visitor, methodName)
-    if len(funcs) == 0:
-        return None
-    
-    optimisers = [
+def getListOfOptimisers():
+    return [
         'Adadelta',
         'Adagrad',
         "Adam",
@@ -206,6 +202,13 @@ def changeOptimiser(source, methodName, visitor: Visitor):
         'RMSprop',
         'SGD',
         ]
+
+def changeOptimiser(source, methodName, visitor: Visitor):
+    funcs = getFuncs(visitor, methodName)
+    if len(funcs) == 0:
+        return None
+    
+    optimisers = getListOfOptimisers()
     newSource = None
     func = funcs[len(funcs) - 1]
     fun_params = visitor.func_key_raw_params[func]
@@ -225,6 +228,6 @@ def changeOptimiser(source, methodName, visitor: Visitor):
                 paramName,
                 optimisers[0]
             )
-        break;
+        break
 
     return newSource

@@ -98,6 +98,26 @@ class WorkerPyTorch:
 
         return newSource
 
+    def changeOptimiser(self):
+        optimisers = injections.getListOfOptimisers()
+        for optim in optimisers:
+            funcs = injections.getFuncs(self.visitor, optim)
+            if len(funcs) > 0:
+                break
+
+        if len(funcs) == 0:
+            return None
+        
+        optimisers.remove(optim)
+        random.shuffle(optimisers)
+
+        return change_line_source(
+            self.source,
+            funcs[0].lineno -1,
+            optim,
+            optimisers[0]
+        )
+
     def inject(self, faultType):
         if faultType == 'memory':
             return injections.causeOutOfMemoryException(self.source, 'DataLoader', self.visitor)
@@ -111,5 +131,7 @@ class WorkerPyTorch:
             return self.causeApiMismatch()
         elif faultType == 'GPU':
             return self.causeGpuUsageMismatch()
+        elif faultType == 'optim':
+            return self.changeOptimiser()
         else:
             print('Fault Type is not supported.')
