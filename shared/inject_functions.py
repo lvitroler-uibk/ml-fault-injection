@@ -23,7 +23,7 @@ def getVars(visitor: Visitor, searchString):
 
     return foundVars
 
-def causeOutOfMemoryException(source, searchString, visitor: Visitor):
+def changeBatchSize(source, searchString, visitor: Visitor, batchSizeMultiplier):
     funcs = getFuncs(visitor, searchString)
     if len(funcs) == 0:
         return None
@@ -31,7 +31,6 @@ def causeOutOfMemoryException(source, searchString, visitor: Visitor):
     newSource = None
     batchSizeName = 'batch_size'
     func = funcs[0]
-    RIDICULOUS_BATCH_SIZE = 100000
 
     fun_params = visitor.func_key_raw_params[func]
     
@@ -47,7 +46,7 @@ def causeOutOfMemoryException(source, searchString, visitor: Visitor):
             source,
             batchSizeParam.start_lineno - 1,
             varValue,
-            str(int(varValue) * RIDICULOUS_BATCH_SIZE)
+            str(int(int(varValue) * batchSizeMultiplier))
         )
     else:
         varLines = getVars(visitor, varValue)
@@ -61,11 +60,15 @@ def causeOutOfMemoryException(source, searchString, visitor: Visitor):
                     source,
                     line - 1,
                     str(varvalue.value),
-                    str(int(varvalue.value) * RIDICULOUS_BATCH_SIZE)
+                    str(int(int(varvalue.value) * batchSizeMultiplier))
                 )
                 break
 
     return newSource
+
+
+def causeOutOfMemoryException(source, searchString, visitor: Visitor):
+    return changeBatchSize(source, searchString, visitor, 100000)
 
 def injectFiiExpandDims(source, searchString, visitor: Visitor):
     funcs = getFuncs(visitor, searchString)
@@ -231,3 +234,6 @@ def changeOptimiser(source, methodName, visitor: Visitor):
         break
 
     return newSource
+
+def worsenHyperparameters(source, searchString, visitor: Visitor):
+    return changeBatchSize(source, searchString, visitor, 0.5)

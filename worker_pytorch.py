@@ -133,5 +133,7 @@ class WorkerPyTorch:
             return self.causeGpuUsageMismatch()
         elif faultType == 'optim':
             return self.changeOptimiser()
+        elif faultType == 'hyperparams':
+            return injections.worsenHyperparameters(self.source, 'DataLoader', self.visitor)
         else:
             print('Fault Type is not supported.')

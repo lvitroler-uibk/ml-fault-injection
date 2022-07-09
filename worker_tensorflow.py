@@ -55,5 +55,7 @@ class WorkerTensorflow:
             return self.causeApiMismatch()
         elif faultType == 'optim':
             return injections.changeOptimiser(self.source, 'compile', self.visitor)
+        elif faultType == 'hyperparams':
+            return injections.worsenHyperparameters(self.source, 'fit', self.visitor)
         else:
             print('Fault Type is not supported.')
