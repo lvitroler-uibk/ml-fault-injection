@@ -118,6 +118,29 @@ class WorkerPyTorch:
             optimisers[0]
         )
 
+
+    def changeModelLoad(self):
+        funcs = injections.getFuncs(self.visitor, 'torch.load')
+        if len(funcs) == 0:
+            return None
+
+        func = funcs[len(funcs) - 1]
+        newSource = self.source
+        modelName = 'model_faulty.pt'
+        modelFile = 'https://github.com/lvitroler-uibk/ml-fault-injection/raw/main/example_models/pytorch/model_fine_tuned.pt'
+        newSource.insert(func.lineno - 1, "torch.hub.download_url_to_file('" + modelFile + "', '" + modelName + "')\n")
+        fun_params = self.visitor.func_key_raw_params[func]
+        
+        _, rawParam = fun_params[0]
+        newSource = change_line_source(
+            newSource,
+            func.lineno,
+            rawParam.name,
+            "'" + modelName + "'"
+        )
+
+        return newSource
+
     def inject(self, faultType):
         loss_functions = [
             'nll_loss',
@@ -132,6 +155,7 @@ class WorkerPyTorch:
 
         # Für model stage
         #falsches bild bzw. falsches model laden in github gespeichert --> change hyperparams
+
         #model load kaputt machen mit falschen pfad
         #missing normalisation step (change Normalize values)
         #anderes neurales Netzwerk verwenden (z.B. statt resnet18 was anderes)
@@ -155,6 +179,6 @@ class WorkerPyTorch:
         elif faultType == 'hyperparams':
             return injections.worsenHyperparameters(self.source, 'DataLoader', self.visitor)
         elif faultType == 'model':
-            return injections.changeModelLoad(self.source, 'torch.load', self.visitor)
+            return self.changeModelLoad()
         else:
             print('Fault Type is not supported.')

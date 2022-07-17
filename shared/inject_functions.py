@@ -238,24 +238,25 @@ def changeOptimiser(source, methodName, visitor: Visitor):
 def worsenHyperparameters(source, searchString, visitor: Visitor):
     return changeBatchSize(source, searchString, visitor, 0.5)
 
-def changeModelLoad(source, loadName, visitor: Visitor):
-    funcs = getFuncs(visitor, loadName)
+def changeModelLoad(source, visitor: Visitor):
+    funcs = getFuncs(visitor, 'load_weights')
     if len(funcs) == 0:
         return None
 
     func = funcs[len(funcs) - 1]
     newSource = source
-    modelName = 'model_faulty.pt'
-    modelFile = 'https://github.com/lvitroler-uibk/ml-fault-injection/raw/main/example_models/pytorch/model_fine_tuned.pt'
-    newSource.insert(func.lineno - 1, "torch.hub.download_url_to_file('" + modelFile + "', '" + modelName + "')\n")
+    weightsPath = 'weights_path'
+    modelFile = 'https://github.com/lvitroler-uibk/ml-fault-injection/raw/main/example_models/keras/weights.h5'
+    newSource.insert(0, 'from keras.utils.data_utils import get_file\n')
+    newSource.insert(func.lineno, weightsPath + " = get_file('model_faulty', '" + modelFile + "')\n")
     fun_params = visitor.func_key_raw_params[func]
     
     _, rawParam = fun_params[0]
     newSource = change_line_source(
         newSource,
-        func.lineno,
+        func.lineno + 1,
         rawParam.name,
-        "'" + modelName + "'"
+        weightsPath
     )
 
     return newSource
