@@ -90,5 +90,7 @@ class WorkerKeras:
             return injections.worsenHyperparameters(self.source, 'fit', self.visitor)
         elif faultType == 'model':
             return injections.changeModelLoad(self.source, self.visitor)
+        elif faultType == 'breakmodel':
+            return injections.breakModelLoad(self.source, 'load_weights', self.visitor)
         else:
             print('Fault Type is not supported.')

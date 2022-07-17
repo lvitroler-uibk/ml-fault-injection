@@ -180,5 +180,7 @@ class WorkerPyTorch:
             return injections.worsenHyperparameters(self.source, 'DataLoader', self.visitor)
         elif faultType == 'model':
             return self.changeModelLoad()
+        elif faultType == 'breakmodel':
+            return injections.breakModelLoad(self.source, 'torch.load', self.visitor)
         else:
             print('Fault Type is not supported.')

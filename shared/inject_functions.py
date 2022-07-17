@@ -260,3 +260,28 @@ def changeModelLoad(source, visitor: Visitor):
     )
 
     return newSource
+
+def breakModelLoad(source, loadString, visitor: Visitor):
+    funcs = getFuncs(visitor, loadString)
+    if len(funcs) == 0:
+        return None
+
+    func = funcs[len(funcs) - 1]
+    fun_params = visitor.func_key_raw_params[func]
+    _, rawParam = fun_params[0]
+    rawParamName = rawParam.name
+    newString = rawParamName
+
+    if rawParamName.find('/') != -1:
+        newString = newString.replace('/', '../', 1)
+    else:
+        newString = newString.replace("'", "'../", 1)
+
+    newSource = change_line_source(
+        source,
+        func.lineno - 1,
+        rawParamName,
+        newString
+    )
+
+    return newSource
