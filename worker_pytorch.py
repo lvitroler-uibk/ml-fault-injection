@@ -119,6 +119,25 @@ class WorkerPyTorch:
         )
 
     def inject(self, faultType):
+        loss_functions = [
+            'nll_loss',
+            'poisson_nll_loss',
+            'gaussian_nll_loss',
+            'kl_div',
+            'cross_entropy',
+            'binary_cross_entropy',
+            'binary_cross_entropy_with_logits',
+            'smooth_l1_loss',
+        ];
+
+        # Für model stage
+        #falsches bild bzw. falsches model laden in github gespeichert --> change hyperparams
+        #model load kaputt machen mit falschen pfad
+        #missing normalisation step (change Normalize values)
+        #anderes neurales Netzwerk verwenden (z.B. statt resnet18 was anderes)
+        #class_names leer machen
+
+
         if faultType == 'memory':
             return injections.causeOutOfMemoryException(self.source, 'DataLoader', self.visitor)
         elif faultType == 'FII':

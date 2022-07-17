@@ -51,6 +51,29 @@ class WorkerKeras:
         return injections.exchangeParameterNames(self.source, 'fit', exchanges, self.visitor)
     
     def inject(self, faultType):
+        loss_functions = [
+            'categorical_crossentropy',
+            'binary_crossentropy',
+            'binary_focal_crossentropy',
+            'categorical_hinge',
+            'cosine_similarity',
+            'KLD',
+            'MAE',
+            'MAPE',
+            'MSE',
+            'MSLE',
+            'kl_divergence',
+            'poisson',
+        ];
+
+        #input type
+        #too large neurons
+        #changing activation functions
+        #change training data
+        #change test data
+        #change image to test
+        #pytorch, keras import kaputt machen
+
         if faultType == 'memory':
             return injections.causeOutOfMemoryException(self.source, 'fit', self.visitor)
         elif faultType == 'FII':
