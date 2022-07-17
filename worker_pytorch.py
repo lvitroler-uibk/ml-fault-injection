@@ -154,5 +154,7 @@ class WorkerPyTorch:
             return self.changeOptimiser()
         elif faultType == 'hyperparams':
             return injections.worsenHyperparameters(self.source, 'DataLoader', self.visitor)
+        elif faultType == 'model':
+            return injections.changeModelLoad(self.source, 'torch.load', self.visitor)
         else:
             print('Fault Type is not supported.')

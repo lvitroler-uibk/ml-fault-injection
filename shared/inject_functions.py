@@ -237,3 +237,25 @@ def changeOptimiser(source, methodName, visitor: Visitor):
 
 def worsenHyperparameters(source, searchString, visitor: Visitor):
     return changeBatchSize(source, searchString, visitor, 0.5)
+
+def changeModelLoad(source, loadName, visitor: Visitor):
+    funcs = getFuncs(visitor, loadName)
+    if len(funcs) == 0:
+        return None
+
+    func = funcs[len(funcs) - 1]
+    newSource = source
+    modelName = 'model_faulty.pt'
+    modelFile = 'https://github.com/lvitroler-uibk/ml-fault-injection/raw/main/example_models/pytorch/model_fine_tuned.pt'
+    newSource.insert(func.lineno - 1, "torch.hub.download_url_to_file('" + modelFile + "', '" + modelName + "')\n")
+    fun_params = visitor.func_key_raw_params[func]
+    
+    _, rawParam = fun_params[0]
+    newSource = change_line_source(
+        newSource,
+        func.lineno,
+        rawParam.name,
+        "'" + modelName + "'"
+    )
+
+    return newSource
