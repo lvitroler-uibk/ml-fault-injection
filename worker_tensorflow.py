@@ -61,5 +61,7 @@ class WorkerTensorflow:
             return injections.changeModelLoad(self.source, self.visitor)
         elif faultType == 'breakmodel':
             return injections.breakModelLoad(self.source, 'torch.load', self.visitor)
+        elif faultType == 'delay':
+            return injections.addDelay(self.source, 'predict', self.visitor)
         else:
             print('Fault Type is not supported.')

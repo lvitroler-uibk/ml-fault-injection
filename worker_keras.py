@@ -92,5 +92,7 @@ class WorkerKeras:
             return injections.changeModelLoad(self.source, self.visitor)
         elif faultType == 'breakmodel':
             return injections.breakModelLoad(self.source, 'load_weights', self.visitor)
+        elif faultType == 'delay':
+            return injections.addDelay(self.source, 'predict', self.visitor)
         else:
             print('Fault Type is not supported.')

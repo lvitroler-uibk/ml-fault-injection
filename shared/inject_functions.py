@@ -245,10 +245,17 @@ def changeModelLoad(source, visitor: Visitor):
 
     func = funcs[len(funcs) - 1]
     newSource = source
+
+    modelString = newSource[func.lineno - 1]
+    indentationLength = len(modelString) - len(modelString.lstrip())
+
     weightsPath = 'weights_path'
     modelFile = 'https://github.com/lvitroler-uibk/ml-fault-injection/raw/main/example_models/keras/weights.h5'
     newSource.insert(0, 'from keras.utils.data_utils import get_file\n')
-    newSource.insert(func.lineno, weightsPath + " = get_file('model_faulty', '" + modelFile + "')\n")
+
+    loadString = weightsPath + " = get_file('model_faulty', '" + modelFile + "')"
+    newSource.insert(func.lineno, loadString.rjust(len(loadString) + indentationLength) + '\n')
+
     fun_params = visitor.func_key_raw_params[func]
     
     _, rawParam = fun_params[0]
@@ -283,5 +290,20 @@ def breakModelLoad(source, loadString, visitor: Visitor):
         rawParamName,
         newString
     )
+
+    return newSource
+
+def addDelay(source, predictString, visitor: Visitor):
+    funcs = getFuncs(visitor, predictString)
+    if len(funcs) == 0:
+        return None
+
+    func = funcs[len(funcs) - 1]
+    newSource = source
+    modelString = newSource[func.lineno - 1]
+    indentationLength = len(modelString) - len(modelString.lstrip())
+    newSource.insert(0, 'import time\n')
+    sleepString = 'time.sleep(2)'
+    newSource.insert(func.lineno, sleepString.rjust(len(sleepString) + indentationLength) + '\n')
 
     return newSource

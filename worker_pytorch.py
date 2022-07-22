@@ -126,11 +126,15 @@ class WorkerPyTorch:
 
         func = funcs[len(funcs) - 1]
         newSource = self.source
+        loadString = newSource[func.lineno - 1]
+        indentationLength = len(loadString) - len(loadString.lstrip())
+
         modelName = 'model_faulty.pt'
         modelFile = 'https://github.com/lvitroler-uibk/ml-fault-injection/raw/main/example_models/pytorch/model_fine_tuned.pt'
-        newSource.insert(func.lineno - 1, "torch.hub.download_url_to_file('" + modelFile + "', '" + modelName + "')\n")
+        loadString = "torch.hub.download_url_to_file('" + modelFile + "', '" + modelName + "')"
+        newSource.insert(func.lineno - 1, loadString.rjust(len(loadString) + indentationLength) + '\n')
+
         fun_params = self.visitor.func_key_raw_params[func]
-        
         _, rawParam = fun_params[0]
         newSource = change_line_source(
             newSource,
@@ -182,5 +186,7 @@ class WorkerPyTorch:
             return self.changeModelLoad()
         elif faultType == 'breakmodel':
             return injections.breakModelLoad(self.source, 'torch.load', self.visitor)
+        elif faultType == 'delay':
+            return injections.addDelay(self.source, 'model', self.visitor)
         else:
             print('Fault Type is not supported.')
