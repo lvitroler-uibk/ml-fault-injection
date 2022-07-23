@@ -307,3 +307,14 @@ def addDelay(source, predictString, visitor: Visitor):
     newSource.insert(func.lineno, sleepString.rjust(len(sleepString) + indentationLength) + '\n')
 
     return newSource
+
+def removeNormalisation(source, normalisationString, visitor: Visitor):
+    funcs = getFuncs(visitor, normalisationString)
+    if len(funcs) == 0:
+        return None
+
+    func = funcs[len(funcs) - 1]
+    newSource = source
+    newSource[func.lineno - 1] = ''
+
+    return newSource

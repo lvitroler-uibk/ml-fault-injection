@@ -188,5 +188,7 @@ class WorkerPyTorch:
             return injections.breakModelLoad(self.source, 'torch.load', self.visitor)
         elif faultType == 'delay':
             return injections.addDelay(self.source, 'model', self.visitor)
+        elif faultType == 'normalisation':
+            return injections.removeNormalisation(self.source, 'Normalize', self.visitor)
         else:
             print('Fault Type is not supported.')
