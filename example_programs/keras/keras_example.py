@@ -1,6 +1,6 @@
 import numpy as np
-from tensorflow import keras
-from tensorflow.keras import layers
+import keras
+from keras import layers
 
 # EXAMPLE: https://keras.io/examples/vision/mnist_convnet/
 # Model / data parameters

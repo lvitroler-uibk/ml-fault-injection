@@ -190,5 +190,12 @@ class WorkerPyTorch:
             return injections.addDelay(self.source, 'model', self.visitor)
         elif faultType == 'normalisation':
             return injections.removeNormalisation(self.source, 'Normalize', self.visitor)
+        elif faultType == 'networks':
+            networkSwitches = {
+                'Module': 'RNN',
+                'RNN': 'Module'
+            }
+
+            return injections.changeNetworks(self.source, networkSwitches, self.visitor)
         else:
             print('Fault Type is not supported.')

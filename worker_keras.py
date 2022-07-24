@@ -96,5 +96,12 @@ class WorkerKeras:
             return injections.addDelay(self.source, 'predict', self.visitor)
         elif faultType == 'normalisation':
             return injections.removeNormalisation(self.source, 'Normalization', self.visitor)
+        elif faultType == 'networks':
+            networkSwitches = {
+                'keras.Input': 'layers.SimpleRNN',
+                'layers.SimpleRNN': 'keras.Input'
+            }
+
+            return injections.changeNetworks(self.source, networkSwitches, self.visitor)
         else:
             print('Fault Type is not supported.')

@@ -23,6 +23,16 @@ def getVars(visitor: Visitor, searchString):
 
     return foundVars
 
+def getLoads(visitor: Visitor, searchString):
+    foundVars = []
+
+    for loads in visitor.load:
+        for key, value in loads.items():
+            if searchString in key:
+                foundVars.append(value)
+
+    return foundVars
+
 def changeBatchSize(source, searchString, visitor: Visitor, batchSizeMultiplier):
     funcs = getFuncs(visitor, searchString)
     if len(funcs) == 0:
@@ -316,5 +326,21 @@ def removeNormalisation(source, normalisationString, visitor: Visitor):
     func = funcs[len(funcs) - 1]
     newSource = source
     newSource[func.lineno - 1] = ''
+
+    return newSource
+
+def changeNetworks(source, networkSwitches, visitor: Visitor):
+    for key, value in networkSwitches.items():
+        loads = getLoads(visitor, key)
+        if len(loads) == 0:
+            continue
+
+        load = loads[len(loads) - 1]
+        newSource = change_line_source(
+            source,
+            load.lineno - 1,
+            key,
+            value
+        )
 
     return newSource
