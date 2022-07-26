@@ -1,5 +1,6 @@
 import numpy as np
 import keras
+import tensorflow
 from keras import layers
 
 # EXAMPLE: https://keras.io/examples/vision/mnist_convnet/
@@ -8,7 +9,7 @@ num_classes = 10
 input_shape = (28, 28, 1)
 
 # the data, split between train and test sets
-(x_train, y_train), (x_test, y_test) = keras.datasets.mnist.load_data()
+(x_train, y_train), (x_test, y_test) = tensorflow.keras.datasets.mnist.load_data()
 
 # Scale images to the [0, 1] range
 x_train = x_train.astype("float32") / 255
@@ -22,8 +23,8 @@ print(x_test.shape[0], "test samples")
 
 
 # convert class vectors to binary class matrices
-y_train = keras.utils.to_categorical(y_train, num_classes)
-y_test = keras.utils.to_categorical(y_test, num_classes)
+y_train = tensorflow.keras.utils.to_categorical(y_train, num_classes)
+y_test = tensorflow.keras.utils.to_categorical(y_test, num_classes)
 
 model = keras.Sequential(
     [
