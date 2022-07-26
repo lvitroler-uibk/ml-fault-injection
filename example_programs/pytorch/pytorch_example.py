@@ -72,6 +72,7 @@ def main():
     gamma = 0.7
     seed = 1
 
+    torch.zeros([2, 4], dtype=torch.int32)
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     torch.manual_seed(seed)
 

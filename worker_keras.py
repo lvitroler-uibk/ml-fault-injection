@@ -103,5 +103,7 @@ class WorkerKeras:
             }
 
             return injections.changeNetworks(self.source, networkSwitches, self.visitor)
+        elif faultType == 'datatype':
+            return injections.changeDataType(self.source, self.visitor)
         else:
             print('Fault Type is not supported.')

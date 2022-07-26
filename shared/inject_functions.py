@@ -344,3 +344,35 @@ def changeNetworks(source, networkSwitches, visitor: Visitor):
         )
 
     return newSource
+
+def changeDataType(source, visitor: Visitor):
+    dataTypes = [
+        'float',
+        'int'
+    ]
+
+    dataTypeFound = False
+    newSource = None
+    for index, dataType in enumerate(dataTypes):
+        if dataTypeFound:
+            break
+
+        for _, vars in visitor.func_key_raw_params.items():
+            for _, rawParam in vars:
+                if dataType not in rawParam.name:
+                    continue
+                if newSource == None:
+                    newSource = source
+
+                copy = dataTypes.copy()
+                copy.pop(index)
+                random.shuffle(copy)
+
+                newSource = change_line_source(
+                    newSource,
+                    rawParam.start_lineno - 1,
+                    dataType,
+                    copy[0]
+                )
+
+    return newSource

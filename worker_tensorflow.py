@@ -65,5 +65,7 @@ class WorkerTensorflow:
             return injections.addDelay(self.source, 'predict', self.visitor)
         elif faultType == 'normalisation':
             return injections.removeNormalisation(self.source, 'Normalization', self.visitor)
+        elif faultType == 'datatype':
+            return injections.changeDataType(self.source, self.visitor)
         else:
             print('Fault Type is not supported.')
