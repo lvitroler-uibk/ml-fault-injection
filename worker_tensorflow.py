@@ -67,5 +67,7 @@ class WorkerTensorflow:
             return injections.removeNormalisation(self.source, 'Normalization', self.visitor)
         elif faultType == 'datatype':
             return injections.changeDataType(self.source, self.visitor)
+        elif faultType == 'edittestdata':
+            return injections.halfTestData(self.source, 'fit', self.visitor)
         else:
             print('Fault Type is not supported.')

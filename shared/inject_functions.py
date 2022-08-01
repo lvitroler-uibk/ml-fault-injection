@@ -376,3 +376,28 @@ def changeDataType(source, visitor: Visitor):
                 )
 
     return newSource
+
+def halfTestData(source, searchString, visitor: Visitor):
+    funcs = getFuncs(visitor, searchString)
+    if len(funcs) == 0:
+        return None
+    
+    func = funcs[len(funcs) - 1]
+    fun_params = visitor.func_key_raw_params[func]
+
+    newSource = source
+    counter = 0
+    for _, rawParam in fun_params:
+        if counter > 1:
+            break
+        
+        newSource = change_line_source(
+            newSource,
+            rawParam.start_lineno - 1,
+            rawParam.name,
+            rawParam.name + '/2'
+        )        
+        counter += 1
+    
+    return newSource
+

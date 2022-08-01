@@ -1,10 +1,11 @@
 from shared.utils import change_line_source
 import random
 import shared.inject_functions as injections
+from shared.ast_parser import Visitor
 
 class WorkerPyTorch:
     
-    def __init__(self, source, visitor):
+    def __init__(self, source, visitor: Visitor):
         self.source = source
         self.visitor = visitor
 
@@ -145,6 +146,31 @@ class WorkerPyTorch:
 
         return newSource
 
+    def halfTestData(self):
+        funcs = injections.getFuncs(self.visitor, 'DataLoader')
+        if len(funcs) == 0:
+            return None
+
+        newSource = self.source
+        counter = 0
+        for func in funcs:
+            if counter > 1:
+                break
+
+            fun_params = self.visitor.func_key_raw_params[func]
+            _, rawParam = fun_params[0]
+
+            newSource = change_line_source(
+                newSource,
+                rawParam.start_lineno - 1,
+                rawParam.name,
+                rawParam.name + '/2'
+            )        
+            counter += 1
+        
+        return newSource
+
+
     def inject(self, faultType):
         loss_functions = [
             'nll_loss',
@@ -160,8 +186,6 @@ class WorkerPyTorch:
         # Für model stage
         #falsches bild bzw. falsches model laden in github gespeichert --> change hyperparams
 
-        #model load kaputt machen mit falschen pfad
-        #missing normalisation step (change Normalize values)
         #anderes neurales Netzwerk verwenden (z.B. statt resnet18 was anderes)
         #class_names leer machen
 
@@ -199,5 +223,7 @@ class WorkerPyTorch:
             return injections.changeNetworks(self.source, networkSwitches, self.visitor)
         elif faultType == 'datatype':
             return injections.changeDataType(self.source, self.visitor)
+        elif faultType == 'edittestdata':
+            return self.halfTestData()
         else:
             print('Fault Type is not supported.')
