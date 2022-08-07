@@ -226,5 +226,13 @@ class WorkerPyTorch:
             return injections.changeDataType(self.source, self.visitor)
         elif faultType == 'edittestdata':
             return self.halfTestData()
+        elif faultType == 'layer':
+            # SO 33686464
+            switchFunctions = {
+                'squeeze': 'unsqueeze',
+                'unsqueeze': 'squeeze'
+            }
+
+            return injections.switchFunctions(self.source, switchFunctions, self.visitor)
         else:
             print('Fault Type is not supported.')

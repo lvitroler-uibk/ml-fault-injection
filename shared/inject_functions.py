@@ -411,3 +411,19 @@ def causeParameterRestrictionIncompatible(source, searchString, visitor: Visitor
     newSource[func.lineno -1] = ''
 
     return newSource
+
+def switchFunctions(source, switchFunctions, visitor: Visitor):
+    for key, value in switchFunctions.items():
+        funcs = getFuncs(visitor, key)
+        if len(funcs) == 0:
+            continue
+
+        func = funcs[len(funcs) - 1]
+        return change_line_source(
+            source,
+            func.lineno - 1,
+            key,
+            value
+        )
+
+    return None

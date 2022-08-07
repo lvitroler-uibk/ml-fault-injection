@@ -79,5 +79,13 @@ class WorkerTensorflow:
             return injections.changeDataType(self.source, self.visitor)
         elif faultType == 'edittestdata':
             return injections.halfTestData(self.source, 'fit', self.visitor)
+        elif faultType == 'layer':
+            # SO 33686464
+            switchFunctions = {
+                'concat': 'pack',
+                'pack': 'concat'
+            }
+
+            return injections.switchFunctions(self.source, switchFunctions, self.visitor)
         else:
             print('Fault Type is not supported.')
