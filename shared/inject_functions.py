@@ -401,3 +401,13 @@ def halfTestData(source, searchString, visitor: Visitor):
     
     return newSource
 
+def causeParameterRestrictionIncompatible(source, searchString, visitor: Visitor):
+    funcs = getFuncs(visitor, searchString)
+    if len(funcs) == 0:
+        return None
+    
+    func = funcs[len(funcs) - 1]
+    newSource = source
+    newSource[func.lineno -1] = ''
+
+    return newSource

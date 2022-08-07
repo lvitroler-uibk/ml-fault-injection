@@ -84,6 +84,8 @@ class WorkerKeras:
             return self.causeLabelOutputIncompatible()
         elif faultType == 'API':
             return self.causeApiMismatch()
+        elif faultType == 'PRI':
+            return injections.causeParameterRestrictionIncompatible(self.source, 'expand_dims', self.visitor)
         elif faultType == 'optim':
             return injections.changeOptimiser(self.source, 'compile', self.visitor)
         elif faultType == 'hyperparams':

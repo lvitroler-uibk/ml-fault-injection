@@ -42,6 +42,14 @@ class WorkerTensorflow:
 
         return newSource
     
+    def causeApiMismatch(self):
+        exchanges = {
+            'epochs': 'nb_epoch',
+            'nb_epoch': 'epochs'
+        }
+
+        return injections.exchangeParameterNames(self.source, 'fit', exchanges, self.visitor)
+    
     def inject(self, faultType):
         if faultType == 'memory':
             return injections.causeOutOfMemoryException(self.source, 'fit', self.visitor)
@@ -53,6 +61,8 @@ class WorkerTensorflow:
             return self.causeLabelOutputIncompatible()
         elif faultType == 'API':
             return self.causeApiMismatch()
+        elif faultType == 'PRI':
+            return injections.causeParameterRestrictionIncompatible(self.source, 'expand_dims', self.visitor)
         elif faultType == 'optim':
             return injections.changeOptimiser(self.source, 'compile', self.visitor)
         elif faultType == 'hyperparams':

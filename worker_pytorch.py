@@ -189,7 +189,6 @@ class WorkerPyTorch:
         #anderes neurales Netzwerk verwenden (z.B. statt resnet18 was anderes)
         #class_names leer machen
 
-
         if faultType == 'memory':
             return injections.causeOutOfMemoryException(self.source, 'DataLoader', self.visitor)
         elif faultType == 'FII':
@@ -200,6 +199,8 @@ class WorkerPyTorch:
             return self.causeLabelOutputIncompatible()
         elif faultType == 'API':
             return self.causeApiMismatch()
+        elif faultType == 'PRI':
+            return injections.causeParameterRestrictionIncompatible(self.source, 'unsqueeze', self.visitor)
         elif faultType == 'GPU':
             return self.causeGpuUsageMismatch()
         elif faultType == 'optim':
