@@ -33,10 +33,35 @@ class WorkerScitkit:
 
         return newSource
 
+    def causeApiMismatch(self):
+        textFunctions = [
+            'CountVectorizer',
+            'TfidfVectorizer',
+            'HashingVectorizer'
+        ]
+
+        newSource = None
+        for function in textFunctions:
+            funcs = injections.getFuncs(self.visitor, function)
+            if len(funcs) == 0:
+                continue
+
+            func = funcs[0]
+            newSource = change_line_source(
+                self.source,
+                func.lineno -1,
+                '(',
+                '(charset=None,'
+            )
+
+        return newSource
+
     def inject(self, faultType):
         if faultType == 'memory':
             return self.causeOutOfMemoryException()
         elif faultType == 'delay':
             return injections.addDelay(self.source, 'cosine_similarity', self.visitor)
+        elif faultType == 'API':
+            return self.causeApiMismatch()
         else:
             print('Fault Type is not supported.')
