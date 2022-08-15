@@ -3,8 +3,8 @@ from shared.utils import write_new_source_code
 from shared.ast_parser import Visitor
 from worker_keras import WorkerKeras
 from worker_pytorch import WorkerPyTorch
-from .worker_scikit import WorkerScitkit
 from worker_tensorflow import WorkerTensorflow
+from worker_scikit import WorkerScitkit
 
 class PythonInjector:
     def __init__(self, fileName):
