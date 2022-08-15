@@ -3,6 +3,7 @@ from shared.utils import write_new_source_code
 from shared.ast_parser import Visitor
 from worker_keras import WorkerKeras
 from worker_pytorch import WorkerPyTorch
+from .worker_scikit import WorkerScitkit
 from worker_tensorflow import WorkerTensorflow
 
 class PythonInjector:
@@ -18,6 +19,8 @@ class PythonInjector:
             self.library = 'keras'
         elif 'tensorflow' in raw_source:
             self.library = 'tensorflow'
+        elif 'sklearn' in raw_source:
+            self.library = 'scikit'
         
         self.visitor = Visitor(self.source)
         self.visitor.visit(self.root_node)
@@ -31,6 +34,9 @@ class PythonInjector:
             source = workerKeras.inject(fault_type)
         elif 'tensorflow' in self.library:
             workerTensorflow = WorkerTensorflow(self.source, self.visitor)
+            source = workerTensorflow.inject(fault_type)
+        elif 'scikit' in self.library:
+            workerTensorflow = WorkerScitkit(self.source, self.visitor)
             source = workerTensorflow.inject(fault_type)
 
         if source:
