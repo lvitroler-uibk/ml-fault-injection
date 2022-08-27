@@ -246,9 +246,8 @@ def changeOptimiser(source, methodName, visitor: Visitor):
 
 def worsenHyperparameters(source, searchString, visitor: Visitor):
     newSource = changeParamValue(source, searchString, visitor, 0.5, 'batch_size')
-    newSource = changeParamValue(source, searchString, visitor, 0.5, 'epochs')
 
-    return newSource
+    return changeParamValue(newSource, searchString, visitor, 0.5, 'epochs')
 
 def changeModelLoad(source, visitor: Visitor):
     funcs = getFuncs(visitor, 'load_weights')

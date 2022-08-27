@@ -170,6 +170,23 @@ class WorkerPyTorch:
         
         return newSource
 
+    def worsenHyperparameters(self):
+        multiplier = 0.5
+        newSource = injections.changeParamValue(self.source, 'DataLoader', self.visitor, multiplier, 'batch_size')
+
+        vars = injections.getVars(self.visitor, 'epochs')
+        line = vars[0]
+        varvalue = self.visitor.lineno_varvalue[line][0]
+
+        newSource = change_line_source(
+            newSource,
+            line - 1,
+            str(varvalue.value),
+            str(int(int(varvalue.value) * multiplier))
+        )
+
+        return newSource
+
 
     def inject(self, faultType):
         loss_functions = [
@@ -206,7 +223,7 @@ class WorkerPyTorch:
         elif faultType == 'optim':
             return self.changeOptimiser()
         elif faultType == 'hyperparams':
-            return injections.worsenHyperparameters(self.source, 'DataLoader', self.visitor)
+            return self.worsenHyperparameters()
         elif faultType == 'model':
             return self.changeModelLoad()
         elif faultType == 'breakmodel':
