@@ -33,20 +33,19 @@ def getLoads(visitor: Visitor, searchString):
 
     return foundVars
 
-def changeBatchSize(source, searchString, visitor: Visitor, batchSizeMultiplier):
+def changeParamValue(source, searchString, visitor: Visitor, batchSizeMultiplier, paramName):
     funcs = getFuncs(visitor, searchString)
     if len(funcs) == 0:
         return None
     
     newSource = None
-    batchSizeName = 'batch_size'
     func = funcs[0]
 
     fun_params = visitor.func_key_raw_params[func]
     
     batchSizeParam = None
     for varName, rawParam in fun_params:
-        if varName is not None and batchSizeName in varName:
+        if varName is not None and paramName in varName:
             batchSizeParam = rawParam
             break
 
@@ -78,7 +77,7 @@ def changeBatchSize(source, searchString, visitor: Visitor, batchSizeMultiplier)
 
 
 def causeOutOfMemoryException(source, searchString, visitor: Visitor):
-    return changeBatchSize(source, searchString, visitor, 100000)
+    return changeParamValue(source, searchString, visitor, 100000, 'batch_size')
 
 def injectFiiExpandDims(source, searchString, visitor: Visitor):
     funcs = getFuncs(visitor, searchString)
@@ -246,7 +245,10 @@ def changeOptimiser(source, methodName, visitor: Visitor):
     return newSource
 
 def worsenHyperparameters(source, searchString, visitor: Visitor):
-    return changeBatchSize(source, searchString, visitor, 0.5)
+    newSource = changeParamValue(source, searchString, visitor, 0.5, 'batch_size')
+    newSource = changeParamValue(source, searchString, visitor, 0.5, 'epochs')
+
+    return newSource
 
 def changeModelLoad(source, visitor: Visitor):
     funcs = getFuncs(visitor, 'load_weights')
