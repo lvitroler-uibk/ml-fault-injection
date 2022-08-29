@@ -73,7 +73,20 @@ class WorkerScitkit:
             )
 
     def causeDataInitFault(self):
-        return None
+        funcs = injections.getFuncs(self.visitor, 'fit_transform')
+        if len(funcs) == 0:
+            return None
+        
+        func = funcs[0]
+        fun_params = self.visitor.func_key_raw_params[func]
+        _, rawParam = fun_params[0]
+
+        return change_line_source(
+                self.source,
+                rawParam.start_lineno - 1,
+                self.source[rawParam.start_lineno - 1],
+                rawParam.name + ' = "key"\n' + self.source[rawParam.start_lineno - 1]
+            )
 
     def inject(self, faultType):
         if faultType == 'memory':
