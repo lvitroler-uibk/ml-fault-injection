@@ -129,8 +129,10 @@ class Visitor(ast.NodeVisitor):
                         print('NotImplementedError')
             elif isinstance(t, ast.Attribute):
                 continue
+            elif isinstance(t, ast.Subscript):
+                continue
             else:
-                print('NotImplementedError: ')
+                print('NotImplementedError')
 
         for t in node.targets:
             super(Visitor, self).visit(t)
