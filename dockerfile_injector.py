@@ -28,6 +28,8 @@ class DockerfileInjector:
             self.libraries['keras'] = '2.3.1'
         elif 'tensorflow' in raw_source:
             self.libraries['tensorflow'] = '1.15.2'
+        elif 'scikit' in raw_source:
+            self.libraries['scikit-learn'] = '0.20'
     
     def deleteLibraries(self):
         newSource = None
