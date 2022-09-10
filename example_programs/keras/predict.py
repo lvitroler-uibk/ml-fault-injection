@@ -40,8 +40,12 @@ def create_model():
   return model
 
 
+class_names = ['T-shirt/top', 'Trouser', 'Pullover', 'Dress', 'Coat',
+               'Sandal', 'Shirt', 'Sneaker', 'Bag', 'Ankle boot']
 img = cv2.imread('./test1/1.jpg')
 img = np.expand_dims(img, axis=0)
 model = create_model()
 model.load_weights('./weight.h5')
-model.predict(img)
+predictions = model.predict(img)
+
+result = class_names[np.argmax(predictions)]

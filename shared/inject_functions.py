@@ -170,11 +170,17 @@ def causeLoiModelOutputShape(source, searchString, visitor: Visitor):
             denseEndPos = elipsisPos
         oldString = oldString[:denseEndPos + 1]
 
+        oldValue = rawParam.name
+        if oldValue.isdigit():
+            newString = str(int(oldValue) + int(oldValue))
+        else:
+            newString = oldValue + ' + ' + oldValue
+
         newSource = change_line_source(
             newSource,
             func.lineno - 1,
             oldString,
-            oldString.replace(str(rawParam.name), str(int(rawParam.name) + int(rawParam.name)))
+            oldString.replace(str(rawParam.name), newString)
         )
 
     return newSource
@@ -426,5 +432,36 @@ def switchFunctions(source, switchFunctions, visitor: Visitor):
             key,
             value
         )
+
+    return None
+
+def addFaultyCondition(source, predictString, visitor: Visitor):
+    funcs = getFuncs(visitor, predictString)
+    if len(funcs) == 0:
+        return None
+
+    func = funcs[len(funcs) - 1]
+
+    newSource = source
+    
+    for i in range(func.lineno, func.lineno+10):
+        if i >= len(source):
+            break
+
+        line = newSource[i]
+        if 'class' in line:
+            subString = line[line.find('class'):]
+
+            newSource = change_line_source(
+                source,
+                i,
+                subString[subString.find('['):subString.find(']') + 1],
+                '[0]'
+            )
+            indentationLength = len(newSource[i]) - len(newSource[i].lstrip())
+            conditionString = 'if True:'
+            newSource.insert(i, conditionString.rjust(len(conditionString) + indentationLength) + '\n  ')
+
+            return newSource
 
     return None

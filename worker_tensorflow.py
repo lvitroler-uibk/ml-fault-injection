@@ -87,5 +87,7 @@ class WorkerTensorflow:
             }
 
             return injections.switchFunctions(self.source, switchFunctions, self.visitor)
+        elif faultType == 'condition':
+            return injections.addFaultyCondition(self.source, 'predict', self.visitor)
         else:
             print('Fault Type is not supported.')

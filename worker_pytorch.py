@@ -251,5 +251,7 @@ class WorkerPyTorch:
             }
 
             return injections.switchFunctions(self.source, switchFunctions, self.visitor)
+        elif faultType == 'condition':
+            return injections.addFaultyCondition(self.source, 'model', self.visitor)
         else:
             print('Fault Type is not supported.')
